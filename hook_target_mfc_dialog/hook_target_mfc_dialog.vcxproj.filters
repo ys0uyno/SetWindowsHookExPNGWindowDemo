@@ -33,9 +33,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dlg_test0.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gdi_image_render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,9 +51,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dlg_test0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gdi_image_render.h">

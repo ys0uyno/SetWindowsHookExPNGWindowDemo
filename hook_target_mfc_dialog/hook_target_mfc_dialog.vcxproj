@@ -100,7 +100,6 @@
     <None Include="res\hook_target_mfc_dialog.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dlg_test0.cpp" />
     <ClCompile Include="gdi_image_render.cpp" />
     <ClCompile Include="hook_target_mfc_dialog.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -110,7 +109,6 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dlg_test0.h" />
     <ClInclude Include="gdi_image_render.h" />
     <ClInclude Include="hook_target_mfc_dialog.h" />
     <ClInclude Include="Resource.h" />
@@ -124,4 +122,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="hook_target_mfc_dialog.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
