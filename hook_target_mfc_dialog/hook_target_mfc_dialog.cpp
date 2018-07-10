@@ -152,6 +152,12 @@ LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:
 		{
+			if (g_subclassed)
+			{
+				break;
+			}
+			g_subclassed = true;
+
 			OutputDebugString(L"WM_INITDIALOG");
 
 			Gdiplus::GdiplusStartupInput input;
@@ -185,7 +191,7 @@ LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 			SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
-			g_old_proc = (WNDPROC)SetWindowLong(hwnd, GWL_WNDPROC, (LONG)new_proc);
+			// g_old_proc = (WNDPROC)SetWindowLong(hwnd, GWL_WNDPROC, (LONG)new_proc);
 		}
 		break;
 	}
