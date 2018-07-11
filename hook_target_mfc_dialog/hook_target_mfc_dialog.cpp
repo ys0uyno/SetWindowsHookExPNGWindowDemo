@@ -12,8 +12,10 @@
 
 HHOOK g_hhook_wnd_ret = NULL;
 HHOOK g_hhook_msg = NULL;
+HHOOK g_hhook_wnd = NULL;
 
 HWND g_hwnd = NULL;
+HWND g_dialog0_hwnd = NULL;
 CBrush g_brush;
 BLENDFUNCTION g_blend;
 Gdiplus::Image *g_gdi_pimage;
@@ -179,6 +181,27 @@ void set_image()
 	}
 }
 
+void remove_window_title_and_border(HWND hwnd)
+{
+	DWORD dwstyle = GetWindowLong(hwnd, GWL_STYLE);
+	DWORD dwstyle_new = WS_OVERLAPPED
+		| WS_VISIBLE
+		| WS_SYSMENU
+		| WS_MINIMIZEBOX
+		| WS_MAXIMIZEBOX
+		| WS_CLIPCHILDREN
+		| WS_CLIPSIBLINGS;
+	dwstyle_new &= dwstyle; // & will remove style
+	SetWindowLong(hwnd, GWL_STYLE, dwstyle_new);
+
+	DWORD dwexstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+	DWORD dwexstyle_new = WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR;
+	dwexstyle_new &= dwexstyle;
+	SetWindowLong(hwnd, GWL_EXSTYLE, dwexstyle_new);
+
+	SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+}
+
 LRESULT CALLBACK new_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (Msg == WM_CTLCOLORBTN)
@@ -222,11 +245,32 @@ LRESULT CALLBACK new_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	if (Msg == WM_MOVE)
 	{
-		OutputDebugString(L"new_proc WM_MOVE");
 		ReSetChildDlg();
 	}
 
 	return CallWindowProc(g_old_proc, hWnd, Msg, wParam, lParam);
+}
+
+LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	CWPSTRUCT *p = (CWPSTRUCT *)lParam;
+	LPDRAWITEMSTRUCT lpDrawItemStruct = (LPDRAWITEMSTRUCT)p->lParam;
+
+	switch (p->message)
+	{
+	case WM_COMMAND:
+		{
+			switch (p->wParam)
+			{
+			case 0x3e8:
+				PostMessage(g_hwnd, WM_COMMAND, MAKEWPARAM(0x3e8, BN_CLICKED), NULL);
+				break;
+			}
+		}
+		break;
+	}
+
+	return CallNextHookEx(g_hhook_wnd, nCode, wParam, lParam);
 }
 
 LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -237,8 +281,6 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 		{
-			OutputDebugString(L"WH_GETMESSAGE WM_PAINT");
-
 			if (g_hwnd)
 			{
 				CDC *pDC = CDC::FromHandle(GetDC(g_hwnd));
@@ -324,23 +366,16 @@ LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			DWORD dwstyle = GetWindowLong(hwnd, GWL_STYLE);
-			DWORD dwstyle_new = WS_OVERLAPPED
-				| WS_VISIBLE
-				| WS_SYSMENU
-				| WS_MINIMIZEBOX
-				| WS_MAXIMIZEBOX
-				| WS_CLIPCHILDREN
-				| WS_CLIPSIBLINGS;
-			dwstyle_new &= dwstyle; // & will remove style
-			SetWindowLong(hwnd, GWL_STYLE, dwstyle_new);
+			remove_window_title_and_border(hwnd);
 
-			DWORD dwexstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-			DWORD dwexstyle_new = WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR;
-			dwexstyle_new &= dwexstyle;
-			SetWindowLong(hwnd, GWL_EXSTYLE, dwexstyle_new);
+			g_dialog0_hwnd = FindWindow(NULL, L"Test0Dialog");
+			if (NULL == g_dialog0_hwnd)
+			{
+				OutputDebugString(L"FindWindow Test0Dialog error");
+				break;
+			}
 
-			SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+			remove_window_title_and_border(g_dialog0_hwnd);
 
 			// OnInitDialog
 			COLORREF transColor = RGB(0, 255, 0);
@@ -366,6 +401,14 @@ LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam)
 			set_image();
 
 			g_old_proc = (WNDPROC)SetWindowLong(hwnd, GWL_WNDPROC, (LONG)new_proc);
+
+			HWND temp_hwnd;
+			temp_hwnd = GetDlgItem(hwnd, 0x3e8);
+			SetParent(temp_hwnd, g_dialog0_hwnd);
+			temp_hwnd = GetDlgItem(hwnd, 0x3e9);
+			SetParent(temp_hwnd, g_dialog0_hwnd);
+			temp_hwnd = GetDlgItem(hwnd, 0x3ea);
+			SetParent(temp_hwnd, g_dialog0_hwnd);
 		}
 		break;
 	}
@@ -386,6 +429,8 @@ extern "C" __declspec(dllexport) void BegDialogHook(HWND hwnd)
 		SetWindowsHookEx(WH_CALLWNDPROCRET, CallWndRetProc, GetModuleHandle(L"hook_target_mfc_dialog"), tid);
 	g_hhook_msg =
 		SetWindowsHookEx(WH_GETMESSAGE, GetMsgProc, GetModuleHandle(L"hook_target_mfc_dialog"), tid);
+	g_hhook_wnd =
+		SetWindowsHookEx(WH_CALLWNDPROC, CallWndProc, GetModuleHandle(L"hook_target_mfc_dialog"), tid);
 }
 
 extern "C" __declspec(dllexport) void EndDialogHook()
@@ -395,4 +440,7 @@ extern "C" __declspec(dllexport) void EndDialogHook()
 
 	if (NULL != g_hhook_msg)
 		UnhookWindowsHookEx(g_hhook_msg);
+
+	if (NULL != g_hhook_wnd)
+		UnhookWindowsHookEx(g_hhook_wnd);
 }

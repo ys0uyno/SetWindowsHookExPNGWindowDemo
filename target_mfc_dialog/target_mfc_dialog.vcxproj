@@ -119,4 +119,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="target_mfc_dialog.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

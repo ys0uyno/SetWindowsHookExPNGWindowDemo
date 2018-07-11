@@ -63,6 +63,7 @@ BEGIN_MESSAGE_MAP(Ctarget_mfc_dialogDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_PNG_LAYER0, &Ctarget_mfc_dialogDlg::OnBnClickedButtonPngLayer0)
 END_MESSAGE_MAP()
 
 
@@ -151,3 +152,10 @@ HCURSOR Ctarget_mfc_dialogDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void Ctarget_mfc_dialogDlg::OnBnClickedButtonPngLayer0()
+{
+	// TODO: Add your control notification handler code here
+	AfxMessageBox(L"Button in PNG Layer clicked");
+}
