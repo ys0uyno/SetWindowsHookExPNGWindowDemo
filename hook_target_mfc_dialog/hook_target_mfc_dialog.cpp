@@ -29,6 +29,8 @@ dlg_test0 *m_pMainDlg;
 WNDPROC g_old_proc;
 static bool g_subclassed = false;
 
+NMHDR g_nmhdr;
+
 class resource_handle
 {
 public:
@@ -286,13 +288,13 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 						);
 					OutputDebugString(sz);
 
-					NMHDR nmhdr;
-					nmhdr.code = ((LPNMHDR)(p->lParam))->code;
-					nmhdr.idFrom = ((LPNMHDR)(p->lParam))->idFrom;
-					nmhdr.hwndFrom = ((LPNMHDR)(p->lParam))->hwndFrom;
+					ZeroMemory(&g_nmhdr, sizeof(g_nmhdr));
+					g_nmhdr.code = ((LPNMHDR)(p->lParam))->code;
+					g_nmhdr.idFrom = ((LPNMHDR)(p->lParam))->idFrom;
+					g_nmhdr.hwndFrom = ((LPNMHDR)(p->lParam))->hwndFrom;
 
 					// if use PostMessage, program will be crashed
-					SendMessage(g_hwnd, WM_NOTIFY, 0, (LPARAM)&nmhdr);
+					PostMessage(g_hwnd, WM_NOTIFY, 0, (LPARAM)&g_nmhdr);
 				}
 				break;
 			}
