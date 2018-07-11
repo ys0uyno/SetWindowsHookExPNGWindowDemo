@@ -64,6 +64,8 @@ BEGIN_MESSAGE_MAP(Ctarget_mfc_dialogDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_PNG_LAYER0, &Ctarget_mfc_dialogDlg::OnBnClickedButtonPngLayer0)
+	ON_NOTIFY(NM_CLICK, IDC_SYSLINK_PNG_LAYER0, &Ctarget_mfc_dialogDlg::OnNMClickSyslinkPngLayer0)
+	ON_BN_CLICKED(IDC_CHECK_PNG_LAYER0, &Ctarget_mfc_dialogDlg::OnBnClickedCheckPngLayer0)
 END_MESSAGE_MAP()
 
 
@@ -158,4 +160,20 @@ void Ctarget_mfc_dialogDlg::OnBnClickedButtonPngLayer0()
 {
 	// TODO: Add your control notification handler code here
 	AfxMessageBox(L"Button in PNG Layer clicked");
+}
+
+
+void Ctarget_mfc_dialogDlg::OnNMClickSyslinkPngLayer0(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// TODO: Add your control notification handler code here
+	*pResult = 0;
+
+	AfxMessageBox(L"Syslink in PNG Layer clicked");
+}
+
+
+void Ctarget_mfc_dialogDlg::OnBnClickedCheckPngLayer0()
+{
+	// TODO: Add your control notification handler code here
+	AfxMessageBox(L"Check in PNG Layer clicked");
 }

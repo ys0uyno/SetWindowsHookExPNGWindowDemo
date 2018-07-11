@@ -31,4 +31,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButtonPngLayer0();
+	afx_msg void OnNMClickSyslinkPngLayer0(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedCheckPngLayer0();
 };

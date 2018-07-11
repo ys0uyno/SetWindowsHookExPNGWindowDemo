@@ -254,7 +254,6 @@ LRESULT CALLBACK new_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	CWPSTRUCT *p = (CWPSTRUCT *)lParam;
-	LPDRAWITEMSTRUCT lpDrawItemStruct = (LPDRAWITEMSTRUCT)p->lParam;
 
 	switch (p->message)
 	{
@@ -264,6 +263,37 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 			{
 			case 0x3e8:
 				PostMessage(g_hwnd, WM_COMMAND, MAKEWPARAM(0x3e8, BN_CLICKED), NULL);
+				break;
+			case 0x3e9:
+				PostMessage(g_hwnd, WM_COMMAND, MAKEWPARAM(0x3e9, BN_CLICKED), NULL);
+				break;
+			}
+		}
+		break;
+	case WM_NOTIFY:
+		{
+			switch (((LPNMHDR)(p->lParam))->code)
+			{
+			case NM_CLICK:
+				{
+					OutputDebugString(L"NM_CLICK");
+
+					TCHAR sz[MAX_PATH] = {0};
+					_stprintf_s(sz, L"code: %x, hwnd: %x, id: %x",
+						((LPNMHDR)(p->lParam))->code,
+						((LPNMHDR)(p->lParam))->hwndFrom,
+						((LPNMHDR)(p->lParam))->idFrom
+						);
+					OutputDebugString(sz);
+
+					NMHDR nmhdr;
+					nmhdr.code = ((LPNMHDR)(p->lParam))->code;
+					nmhdr.idFrom = ((LPNMHDR)(p->lParam))->idFrom;
+					nmhdr.hwndFrom = ((LPNMHDR)(p->lParam))->hwndFrom;
+
+					// if use PostMessage, program will be crashed
+					SendMessage(g_hwnd, WM_NOTIFY, 0, (LPARAM)&nmhdr);
+				}
 				break;
 			}
 		}
